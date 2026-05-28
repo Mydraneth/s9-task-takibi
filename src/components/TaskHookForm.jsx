@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { useForm } from "react-hook-form";
 
 export default function TaskHookForm({ kisiler, submitFn }) {
@@ -5,10 +6,19 @@ export default function TaskHookForm({ kisiler, submitFn }) {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm({ mode: "onChange" });
-
+  } = useForm({
+    mode: "onChange",
+    defaultValues: { title: "", description: "", people: [] },
+  });
+  function onSubmit(data) {
+    submitFn({
+      ...data,
+      id: nanoid(5),
+      status: "yapılacak",
+    });
+  }
   return (
-    <form onSubmit={handleSubmit(submitFn)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="form-line">
         <label htmlFor="title-input">Başlık</label>
         <input
@@ -55,9 +65,9 @@ export default function TaskHookForm({ kisiler, submitFn }) {
                   value={kisi}
                   {...register("people", {
                     validate: (value) => {
-                      if (value.length > 3) {
+                      if (value?.length > 3) {
                         return "En fazla 3 kişi seçebilirsiniz";
-                      } else if (value.length < 1) {
+                      } else if (value?.length < 1) {
                         return "Lütfen en az bir kişi seçin";
                       } else {
                         return true;
